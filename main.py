@@ -1,7 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, QLineEdit, QPushButton, \
-    QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox
+    QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar
+from PyQt6.QtGui import QAction, QIcon
 import sys
 import sqlite3
 
@@ -9,13 +10,14 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__() #initializing the super class, in this case QMainWindow
         self.setWindowTitle("Student Management System")
+        self.setMinimumSize(800, 600)
 
         file_menu_item = self.menuBar().addMenu("&File") # &File is a convention, has to be done
         help_menu_item = self.menuBar().addMenu("&Help")
         edit_menu_item = self.menuBar().addMenu("&Edit")
 
         #Adding subitems to File menu
-        add_student_action = QAction("Add Student",self)
+        add_student_action = QAction(QIcon("icons/add.png"), "Add Student",self)
         add_student_action.triggered.connect(self.insert)
         file_menu_item.addAction(add_student_action)
 
@@ -25,7 +27,7 @@ class MainWindow(QMainWindow):
         about_action.setMenuRole(QAction.MenuRole.NoRole)
 
         #Adding subitems to Edit Menu
-        search_action = QAction("Search",self)
+        search_action = QAction(QIcon("icons/search.png"),"Search",self)
         edit_menu_item.addAction(search_action)
         search_action.triggered.connect(self.search)
 
@@ -37,6 +39,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.table)
         """ This will set what the central widget of the application is
         The central widget is the main area of the window where most of the application's content is displayed"""
+
+        #Create toolbar and add toolbar elements, toolbar will have shortcuts for add students and search functionality
+        toolbar = QToolBar()
+        toolbar.setMovable(True) #User can move around the toolbar
+        self.addToolBar(toolbar)
+        toolbar.addAction(add_student_action)
+        toolbar.addAction(search_action)
 
     def load_data(self):
         connection = sqlite3.connect('database.db')
