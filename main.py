@@ -1,9 +1,10 @@
+from idlelib.help_about import AboutDialog
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, QGridLayout, QLineEdit, QPushButton, \
     QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QComboBox, QToolBar, QStatusBar, QMessageBox
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtCore import pyqtSignal
 import sys
 import sqlite3
 
@@ -25,7 +26,7 @@ class MainWindow(QMainWindow):
         #Adding About Menu
         about_action = QAction("About",self)
         help_menu_item.addAction(about_action)
-        about_action.setMenuRole(QAction.MenuRole.NoRole)
+        about_action.triggered.connect(self.about)
 
         #Adding subitems to Edit Menu
         search_action = QAction(QIcon("icons/search.png"),"Search",self)
@@ -99,6 +100,20 @@ class MainWindow(QMainWindow):
     def delete(self):
         dialog = DeleteDialog()
         dialog.exec()
+
+    def about(self):
+        dialog = AboutDialog()
+        dialog.exec()
+
+class AboutDialog(QMessageBox):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("About")
+        content = """
+        This app was created as an introduction to PyQt6 and SQLite3 libraries.
+        Feel free to modify and reuse this app
+        """
+        self.setText(content)
 
 class EditDialog(QDialog):
     def __init__(self):
