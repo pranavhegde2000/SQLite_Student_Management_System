@@ -100,7 +100,64 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
 class EditDialog(QDialog):
-    pass
+    def __init__(self):
+        super().__init__()  # Initializing the super class, in this case QDialog
+        self.setWindowTitle("Update Student Data")
+        self.setFixedWidth(300)
+        self.setFixedWidth(300)
+
+        layout = QVBoxLayout()
+        #Get student name from current selected row
+        index = main_window.table.currentRow()
+        student_name = main_window.table.item(index, 1).text()
+
+        #Get id from selected row
+        self.student_id = main_window.table.item(index, 0).text()
+
+        # Add student name widget
+        self.student_name = QLineEdit(student_name)
+        """Adding argument student_name in QLineEdit will make the default value the student_name
+        in the text input of GUI, i.e. in this case the current student name in the current row
+        """
+        self.student_name.setPlaceholderText("Name")
+        layout.addWidget(self.student_name)
+
+        #Get course name from current selected row
+        course_name = main_window.table.item(index, 2).text()
+        #Add combo box of courses
+        self.course_name = QComboBox()
+        courses = ["Biology", "Math", "Astronomy", "Physics"]
+        self.course_name.addItems(courses)
+        self.course_name.setCurrentText(course_name)
+        layout.addWidget(self.course_name)
+
+        #Get mobile number from current selected row
+        mobile = main_window.table.item(index, 3).text()
+        #Add mobile widget
+        self.mobile = QLineEdit(mobile)
+        self.mobile.setPlaceholderText("Mobile")
+        layout.addWidget(self.mobile)
+
+        #Add a submit button
+        button = QPushButton("Update")
+        button.clicked.connect(self.update_student)
+        layout.addWidget(button)
+
+        self.setLayout(layout)
+
+    def update_student(self):
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        cursor.execute("UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
+                       (self.student_name.text(),
+                        self.course_name.itemText(self.course_name.currentIndex()),
+                        self.mobile.text(),
+                        self.student_id))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        #Refresh the table after updating values
+        main_window.load_data()
 
 class DeleteDialog(QDialog):
     pass
