@@ -8,6 +8,16 @@ from PyQt6.QtGui import QAction, QIcon
 import sys
 import sqlite3
 
+#DatabaseConnenction class is implemented while refactoring the code
+#It can be called when we want to create a new connection
+class DatabaseConnection:
+    def __init__(self, database_file="database.db"):
+        self.database_file = database_file
+
+    def connect(self):
+        connection = sqlite3.connect(self.database_file)
+        return connection
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__() #initializing the super class, in this case QMainWindow
@@ -75,7 +85,7 @@ class MainWindow(QMainWindow):
         self.statusbar.addWidget(delete_button)
 
     def load_data(self):
-        connection = sqlite3.connect('database.db')
+        connection = DatabaseConnection().connect()#Refactoring the code by creating connection like this, makes it more useable
         result = connection.execute("SELECT * FROM students")
         self.table.setRowCount(0)
         for row_number ,row_data in enumerate(result):
@@ -162,7 +172,7 @@ class EditDialog(QDialog):
         self.setLayout(layout)
 
     def update_student(self):
-        connection = sqlite3.connect('database.db')
+        connection = DatabaseConnection().connect()#Refactoring the code by creating connection like this, makes it more usable
         cursor = connection.cursor()
         cursor.execute("UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
                        (self.student_name.text(),
@@ -198,7 +208,7 @@ class DeleteDialog(QDialog):
 
     def delete_student(self):
 
-        connection = sqlite3.connect('database.db')
+        connection = DatabaseConnection().connect()#Refactoring the code by creating connection like this, makes it more usable
         cursor = connection.cursor()
         cursor.execute("DELETE from students WHERE id = ?",
                        (self.student_id, ))
@@ -254,7 +264,7 @@ class InsertDialog(QDialog):
         course = self.course_name.itemText(self.course_name.currentIndex()) #This is a combo box, so use itemText()
         # currentIndex() will return the currently selected option in the combo box
         mobile = self.mobile.text()
-        connection = sqlite3.connect("database.db")
+        connection = DatabaseConnection().connect()#Refactoring the code by creating connection like this, makes it more usable
         cursor = connection.cursor()
         cursor.execute("INSERT INTO students (name, course, mobile) VALUES (?, ?, ?)",
                        (name, course, mobile))
@@ -291,7 +301,7 @@ class SearchDialog(QDialog):
 
     def search(self):
         name = self.student_name.text()
-        connection = sqlite3.connect("database.db")
+        connection = DatabaseConnection().connect()#Refactoring the code by creating connection like this, makes it more usable
         cursor = connection.cursor()
         result = cursor.execute("SELECT * FROM students WHERE name = ?", (name,))
         rows = list(result)
